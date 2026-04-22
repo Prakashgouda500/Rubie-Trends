@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <link rel="icon" type="image/png" sizes="64x64" href="logo.png">
+    <meta charset="UTF-8">
+    <title>Shop Admin Panel</title>
+    <style>
+        body { font-family: sans-serif;  background: linear-gradient(48deg, rgba(162, 207, 247, 0.54)); }
+        .card { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .logo { color: #333; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #b4da45; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #f39511; }
+
+        .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  
+    
+}
+
+        .logo img {
+    height: 180px; /* Adjust this value to fit your navbar height */
+    width: auto;  /* Maintains aspect ratio */
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+    transform: scale(1.05); /* Slight pop effect on hover */
+}
+
+
+    </style>
+    <!--<a href="home.html" style="color: #007bff; margin-right: 15px; text-decoration: none;">View Shop</a>-->
+</head>
+<body>
+
+    
+
+
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="index.html" style="text-decoration: none; color: #555; font-weight: 600; padding-left:20px;">View Shop</a>
+        <button onclick="adminLogout()" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: auto; font-size: 14px;">
+            Logout
+        </button>
+    </div>
+    
+<!--
+<div class="card">
+    <h2>Add New Product</h2>
+    <input type="text" id="name" placeholder="Product Name (e.g. Nike Shoes)">
+    <input type="number" id="price" placeholder="Price (e.g. 999.99)">
+    <input type="number" id="stock" placeholder="Stock Amount">
+    <input type="text" id="img" placeholder="Image URL">
+    <textarea id="productDescription" placeholder="Product Description" required></textarea>
+    <button onclick="saveToDatabase()">Upload to Store</button>
+</div>
+-->
+
+
+<div class="card" style="margin-bottom: 50px; margin-top: 50px; border: 2px solid #c5c7ca;">
+    <h2>Manage Categories</h2>
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <input type="text" id="new-category-name" placeholder="New Category Name" style="margin:0;">
+        <button onclick="addNewCategory()" style="width: auto; background: #007bff; white-space: nowrap;">Add</button>
+    </div>
+    <div id="current-categories" style="font-size: 0.85rem; color: #666; background: #f9f9f9; padding: 10px; border-radius: 4px;">
+        </div>
+</div>
+
+
+<div class="card">
+    <h2>Add New Product</h2>
+    <input type="text" id="name" placeholder="Product Name">
+    <input type="number" id="price" placeholder="Price">
+    <input type="number" id="stock" placeholder="Stock Amount">
+    <input type="text" id="img" placeholder="Image URL">
+    <label style="font-size: 0.8rem; color: #666;">Select Category:</label>
+    <select id="category" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px;">
+        <option value="Electronics">Electronics</option>
+        <option value="Fashion">Fashion</option>
+        <option value="Accessories">Accessories</option>
+    </select>
+    
+    <textarea id="productDescription" placeholder="Product Description"></textarea>
+    <button onclick="saveToDatabase()">Upload to Store</button>
+</div>
+
+
+
+
+
+<hr>
+<h2>Manage Inventory</h2>
+<div id="admin-product-list"></div>
+
+
+
+<script>
+    
+
+
+async function saveToDatabase() {
+    const productData = {
+        name: document.getElementById('name').value,
+        price: document.getElementById('price').value,
+        stock: document.getElementById('stock').value,
+        image_url: document.getElementById('img').value,
+        description: document.getElementById('productDescription').value,
+        category: document.getElementById('category').value
+    };
+
+    const response = await fetch('http://localhost:3000/api/admin/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData)
+    });
+
+    if (response.ok) {
+        alert("Product Added successfully!");
+        location.reload();
+    }
+}
+
+async function loadAdminProducts() {
+    const response = await fetch('http://localhost:3000/api/products');
+    const products = await response.json();
+    
+    const container = document.getElementById('admin-product-list');
+    container.innerHTML = products.map(p => `
+        <div style="border-bottom: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span><strong>${p.name}</strong> (Price: ₹${p.price})</span>
+            <div>
+                <button onclick="editProduct(${p.id}, ${p.price}, ${p.stock}, '${p.image_url}', '${p.description || ''}', '${p.category || 'Electronics'}')" 
+                        style="width: auto; background: #ffc107; color: black; padding: 5px 10px; margin-right: 5px;">Edit</button>
+                <button onclick="deleteProduct(${p.id})" style="width: auto; background: #dc3545; padding: 5px 10px;">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+/*async function editProduct(id, currentPrice, currentStock, currentImg, currentDesc, currentCat) {
+    const newPrice = prompt("Enter new price:", currentPrice);
+    const newStock = prompt("Enter new stock:", currentStock);
+    const newCat = prompt("Enter Category (Electronics, Fashion, Accessories):", currentCat);
+    const newImg = prompt("Enter new Image URL:", currentImg);
+    const newDesc = prompt("Enter new Description:", currentDesc);
+
+    if (newPrice !== null && newStock !== null && newImg !== null && newDesc !== null && newCat !== null) {
+        const response = await fetch(`http://localhost:3000/api/admin/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                price: newPrice, 
+                stock: newStock, 
+                category: newCat, 
+                image_url: newImg,
+                description: newDesc 
+            })
+        });
+        
+        if (response.ok) {
+            alert("Update Successful!");
+            loadAdminProducts(); 
+        } else {
+            alert("Update failed on server.");
+        }
+    }
+}
+    */
+
+
+
+    async function editProduct(id, currentPrice, currentStock, currentImg, currentDesc, currentCat) {
+    // 1. Fetch the latest categories from localStorage
+    let categories = JSON.parse(localStorage.getItem('shop_categories')) || ["Electronics", "Fashion", "Accessories"];
+    
+    // 2. Create a dropdown string for the prompt (or use a custom modal for better UI)
+    const categoryOptions = categories.join(", ");
+    
+    const newPrice = prompt("Enter new price:", currentPrice);
+    const newStock = prompt("Enter new stock:", currentStock);
+    
+    // Show the user the available categories so they know what to type
+    const newCat = prompt(`Enter Category (Available: ${categoryOptions}):`, currentCat);
+    
+    const newImg = prompt("Enter new Image URL:", currentImg);
+    const newDesc = prompt("Enter new Description:", currentDesc);
+
+    if (newPrice !== null && newStock !== null && newImg !== null && newDesc !== null && newCat !== null) {
+        // Validation: Check if the typed category actually exists in your list
+        if (!categories.includes(newCat)) {
+            alert("Error: That category doesn't exist. Please add it in 'Manage Categories' first.");
+            return;
+        }
+
+        const response = await fetch(`http://localhost:3000/api/admin/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                price: newPrice, 
+                stock: newStock, 
+                category: newCat, 
+                image_url: newImg,
+                description: newDesc 
+            })
+        });
+        
+        if (response.ok) {
+            alert("Update Successful!");
+            loadAdminProducts(); 
+        } else {
+            alert("Update failed on server.");
+        }
+    }
+}
+
+
+
+
+async function deleteProduct(id) {
+    if (confirm("Are you sure?")) {
+        await fetch(`http://localhost:3000/api/admin/delete/${id}`, { method: 'DELETE' });
+        loadAdminProducts();
+    }
+}
+
+// This runs automatically when page opens
+window.onload = function() {
+            renderCategoryDropdown();
+            loadAdminProducts();
+        };
+
+
+function addNewCategory() {
+    const catInput = document.getElementById('new-category-name');
+    const categoryName = catInput.value.trim();
+    
+    if (!categoryName) return alert("Please enter a category name");
+
+    // Get existing categories or start with defaults
+    let categories = JSON.parse(localStorage.getItem('shop_categories')) || ["Electronics", "Fashion", "Accessories"];
+    
+    if (categories.includes(categoryName)) {
+        return alert("This category already exists!");
+    }
+
+    categories.push(categoryName);
+    localStorage.setItem('shop_categories', JSON.stringify(categories));
+    
+    catInput.value = ''; // Clear input
+    renderCategoryDropdown();
+    alert("Category added successfully!");
+}
+
+
+
+function deleteCategory(catName) {
+            if(confirm(`Delete category "${catName}"?`)) {
+                let categories = JSON.parse(localStorage.getItem('shop_categories'));
+                categories = categories.filter(c => c !== catName);
+                localStorage.setItem('shop_categories', JSON.stringify(categories));
+                renderCategoryDropdown();
+            }
+        }
+
+
+function renderCategoryDropdown() {
+    const dropdown = document.getElementById('category'); // Ensure your <select> has this ID
+    const categoryListDisplay = document.getElementById('current-categories');
+    let categories = JSON.parse(localStorage.getItem('shop_categories')) || ["Electronics", "Fashion", "Accessories"];
+
+    // Update the dropdown for adding products
+    dropdown.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    
+    // Update the visual list with delete buttons
+            categoryListDisplay.innerHTML = "<strong>Active:</strong><br>" + 
+                categories.map(cat => `
+                    <span style="display:inline-block; background:#eee; padding:2px 8px; margin:2px; border-radius:12px;">
+                        ${cat} <small onclick="deleteCategory('${cat}')" style="color:red; cursor:pointer; margin-left:5px;">&times;</small>
+                    </span>
+                `).join('');
+        }
+
+
+
+        function adminLogout() {
+    // 1. Remove the user data so they aren't 'logged in' anymore
+    localStorage.removeItem('logged_in_user');
+    
+    // 2. Alert the user
+    alert("Logged out successfully!");
+    
+    // 3. Send them back to the login page
+    window.location.href = 'login.html';
+}
+
+</script>
+
+</body>
+</html>

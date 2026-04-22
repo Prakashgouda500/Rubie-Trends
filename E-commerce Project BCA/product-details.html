@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/png" sizes="128x128" href="logo.png">
+    <title>Product Details</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 40px; background: linear-gradient(48deg, rgba(234, 69, 47, 0.54) 3%, rgba(63, 0, 251, 0.53) 43%, rgba(63, 0, 251, 0.62) 72%);  }
+        .details-container { background: white; padding: 30px; border-radius: 15px; display: flex; gap: 40px; max-width: 900px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        img { width: 400px; border-radius: 10px; object-fit: cover; }
+        .price { color: #28a745; font-size: 2rem; font-weight: bold; }
+        .back-link { display: inline-block; margin-top: 20px; text-decoration: none; color: #007bff; }
+
+        .star-rating { font-size: 2rem; color: #ddd; cursor: pointer; }
+        .star-rating .selected { color: #ffc107; }
+        .review-section { background: white; padding: 30px; border-radius: 15px; max-width: 900px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 80px; padding: 10px; border-radius: 5px; border: 1px solid #ddd; margin-top: 10px; resize: none; }
+    </style>
+</head>
+<body>
+
+    <div id="product-content" class="details-container">
+        </div>
+    
+    <center><a href="index.html" class="back-link" style="color:white;"><b>← Back to Shop</b></a></center>
+
+    <div class="review-section">
+        <h3>Leave a Review</h3>
+        <div class="star-rating" id="star-container">
+            <span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span data-value="4">★</span><span data-value="5">★</span>
+        </div>
+        <textarea id="review-text" placeholder="Write your thoughts..."></textarea>
+        <button onclick="submitReview()" style="margin-top:10px; background:#007bff; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Submit Review</button>
+
+        <div id="reviews-list" style="margin-top: 40px;">
+            <h3>Customer Reviews</h3>
+            <hr>
+            <div id="reviews-container">Loading reviews...</div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    async function loadDetails() {
+        if (!productId) return;
+        try {
+            const response = await fetch(`http://localhost:3000/api/products/${productId}`);
+            const product = await response.json();
+
+            document.getElementById('product-content').innerHTML = `
+                <div><img src="${product.image_url}"></div>
+                <div>
+                    <h1>${product.name}</h1>
+                    <p class="price">₹${parseFloat(product.price).toFixed(2)}</p>
+                    <p><strong>Stock Left:</strong> ${product.stock}</p>
+                    <hr>
+                    <h3>Product Description</h3>
+                    <p>${product.description || "No description provided."}</p>
+                    <button onclick="addToCart('${product.name}', ${product.price})" style="background:#007bff; color:white; padding:15px; border:none; border-radius:5px; cursor:pointer; width:100%;">Add to Cart</button>
+                </div>
+            `;
+            fetchReviews(productId);
+        } catch (err) {
+            console.error("Error loading product:", err);
+        }
+    }
+
+    function addToCart(name, price) {
+        let cart = JSON.parse(localStorage.getItem('my_shop_cart')) || [];
+        const existingItem = cart.find(item => item.name === name);
+        if (existingItem) { existingItem.quantity += 1; } 
+        else { cart.push({ name, price: parseFloat(price), quantity: 1 }); }
+        localStorage.setItem('my_shop_cart', JSON.stringify(cart));
+        alert("Added to cart!");
+    }
+
+    let selectedRating = 0;
+    document.querySelectorAll('#star-container span').forEach(star => {
+        star.onclick = function() {
+            selectedRating = this.getAttribute('data-value');
+            updateStars();
+        };
+    });
+
+    function updateStars() {
+        document.querySelectorAll('#star-container span').forEach(star => {
+            star.classList.toggle('selected', star.getAttribute('data-value') <= selectedRating);
+        });
+    }
+
+    // FIXED: Removed duplicate fetch call and cleaned up logic
+    async function submitReview() {
+        const user = JSON.parse(localStorage.getItem('logged_in_user'));
+        const comment = document.getElementById('review-text').value.trim();
+
+        if (!user) {
+            alert("Please login to leave a review!");
+            window.location.href = 'login.html';
+            return;
+        }
+
+        if (!selectedRating || !comment) {
+            return alert("Please provide both a rating and a comment!");
+        }
+
+        const reviewData = {
+            product_id: productId,
+            user_name: user.username, // Correct property
+            rating: selectedRating,
+            comment: comment
+        };
+
+        try {
+            const response = await fetch('http://localhost:3000/api/reviews', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reviewData)
+            });
+
+            if (response.ok) {
+                alert("Review submitted!");
+                location.reload(); // Refresh to show new review
+            }
+        } catch (err) {
+            console.error("Submission error:", err);
+        }
+    }
+
+    async function fetchReviews(id) {
+        const container = document.getElementById('reviews-container');
+        try {
+            const response = await fetch(`http://localhost:3000/api/reviews/${id}`);
+            const reviews = await response.json();
+
+            if (reviews.length === 0) {
+                container.innerHTML = "<p>No reviews yet. Be the first!</p>";
+                return;
+            }
+
+            container.innerHTML = reviews.map(r => `
+                <div style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                    <div style="color: #ffc107;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+                    <strong>${r.user_name || "Anonymous"}</strong>
+                    <p style="margin: 5px 0; color: #444;">${r.comment}</p>
+                    <small style="color: #999;">${new Date(r.created_at).toLocaleDateString()}</small>
+                </div>
+            `).join('');
+        } catch (err) {
+            container.innerHTML = "Error loading reviews.";
+        }
+    }
+
+    loadDetails();
+</script>
+</body>
+</html>

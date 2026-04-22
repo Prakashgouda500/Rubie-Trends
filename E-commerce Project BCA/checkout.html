@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/png" sizes="128x128" href="logo.png">
+    <title>Checkout</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 50px;  background: linear-gradient(48deg, rgba(234, 69, 47, 0.54) 3%, rgba(63, 0, 251, 0.53) 43%, rgba(63, 0, 251, 0.62) 72%); }
+        .checkout-box { background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .discount-text { color: #22c55e; font-weight: bold; }
+        .total-section { margin-top: 20px; padding-top: 10px; border-top: 2px solid #333; }
+    </style>
+</head>
+<body>
+    <div class="checkout-box">
+        <h2>Confirm Your Order</h2>
+        <div id="checkout-items"></div>
+        
+        <div class="total-section">
+            <div id="discount-display" style="display:none; justify-content: space-between; margin-bottom: 10px;">
+                <span>Discount Applied (10%):</span>
+                <span id="discount-amount" class="discount-text"></span>
+            </div>
+            <h3 id="grand-total">Total: 0.00</h3>
+        </div>
+
+        <button onclick="placeOrder()" style="width:100%;  background: linear-gradient(48deg, rgb(216, 214, 214) 3% ); padding:15px; border:none; border-radius:5px; cursor:pointer; font-size: 1.1rem; margin-top: 20px;">
+            Complete Purchase
+        </button>
+    </div>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem('my_shop_cart')) || [];
+        const user = JSON.parse(localStorage.getItem('logged_in_user'));
+        const discountRate = parseFloat(localStorage.getItem('cart_discount')) || 0;
+
+        let finalTotalToPay = 0; // Global variable to store the calculated total
+
+        function loadCheckout() {
+            if (!user) {
+                alert("Please login first!");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const container = document.getElementById('checkout-items');
+            let subtotal = 0;
+
+            // 1. List all items
+            container.innerHTML = cart.map(item => {
+                subtotal += item.price * item.quantity;
+                return `<div class="item">
+                            <span>${item.name} (x${item.quantity})</span>
+                            <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>`;
+            }).join('');
+
+            // 2. Calculate Discount
+            const discountAmount = subtotal * discountRate;
+            finalTotalToPay = subtotal - discountAmount;
+
+            // 3. Update UI
+            if (discountRate > 0) {
+                document.getElementById('discount-display').style.display = 'flex';
+                document.getElementById('discount-amount').innerText = `-₹${discountAmount.toFixed(2)}`;
+            }
+
+            document.getElementById('grand-total').innerText = "Total to Pay: ₹" + finalTotalToPay.toFixed(2);
+        }
+
+        async function placeOrder() {
+            try {
+                const response = await fetch('http://localhost:3000/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        total_amount: finalTotalToPay, // Sending the DISCOUNTED total
+                        items: cart
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Order Placed Successfully!");
+                    // 4. CLEAR STORAGE ONLY AFTER SUCCESS
+                    localStorage.removeItem('my_shop_cart');
+                    localStorage.removeItem('cart_discount');
+                    window.location.href = 'order-history.html';
+                } else {
+                    alert("Error placing order.");
+                }
+            } catch (error) {
+                console.error("Checkout Error:", error);
+            }
+        }
+
+        // Initialize the page
+        loadCheckout();
+    </script>
+</body>
+</html>
+

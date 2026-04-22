@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" sizes="128x128" href="logo.png">
+    <meta charset="UTF-8">
+    <title>Rubie Trends | Home</title>
+    <style>
+
+
+/* Search Overlay */
+.search-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.95); /* Dark blur effect */
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-container {
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 20px;
+    font-size: 1.5rem;
+    border-radius: 50px;
+    border: none;
+    outline: none;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
+}
+
+.close-search {
+    position: absolute;
+    top: 30px; right: 40px;
+    color: white; font-size: 2rem; cursor: pointer;
+}
+
+/* Icon Styling */
+.search-icon-btn {
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin-right: 15px;
+    transition: 0.3s;
+}
+.search-icon-btn:hover { color: var(--accent); }
+
+        /* Dropdown Container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: rgb(36, 36, 36);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    z-index: 1000;
+    border-radius: 8px;
+    top: 100%;
+    overflow: hidden;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: var(--dark);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    margin-left: 0 !important; /* Reset nav-link margin */
+}
+
+/* Change color on hover */
+.dropdown-content a:hover {
+    background-color: #c7c7c7;
+    color: var(--primary);
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Arrow indicator */
+.dropdown > a::after {
+    content:'▾';
+    font-size: 12px;
+}
+
+        :root { --primary: #2563eb; --dark: #0f172a; --light: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: white; }
+
+        /* Navbar */
+        .navbar { display: flex; justify-content: space-between; padding: 20px 5%; align-items: center; position: absolute; width: 90%; z-index: 100; color: white; height:200px; }
+        /*.logo { font-size: 1.8rem; font-weight: 800; color: white; text-decoration: none; }*/
+
+        .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+        .logo img {
+    height: 300px; /* Adjust this value to fit your navbar height */
+    width: auto;  /* Maintains aspect ratio */
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+    transform: scale(1.05); /* Slight pop effect on hover */
+}
+        .nav-links a { margin-left: 25px; text-decoration: none; color: white; font-weight: 500; }
+
+        /* HERO SLIDER */
+        .slider { width: 100%; height: 70vh; position: relative; overflow: hidden; background: #000; }
+        .slide { 
+            position: absolute; width: 100%; height: 100%; opacity: 0; transition: 0.8s; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white;
+        }
+        .slide.active { opacity: 1; }
+        .slide::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .slide-content { z-index: 10; }
+
+        /* CATEGORY SECTION */
+        .section-title { text-align: center; margin: 60px 0 30px; font-size: 2.2rem; font-weight: 700; }
+        .cat-container { display: flex; gap: 20px; padding: 0 5%; justify-content: center; }
+        .cat-box { 
+            
+            flex: 1; height: 350px; border-radius: 15px; position: relative; overflow: hidden; cursor: pointer; 
+            transition: 0.3s; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        .cat-box:hover { transform: translateY(-10px); }
+        .cat-box img { width: 100%; height: 100%; object-fit: cover; }
+        .cat-label { position: absolute; bottom: 20px; left: 20px; color: white; font-size: 1.6rem; font-weight: bold; z-index: 5; }
+
+        /* NEW ARRIVALS CAROUSEL */
+        .carousel-wrapper { padding: 40px 5%; overflow-x: auto; white-space: nowrap; scroll-behavior: smooth; }
+        .carousel-item { 
+            display: inline-block; width: 220px; background: rgb(255, 255, 255); margin-right: 20px; 
+            padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer;
+        }
+        .carousel-item img { width: 100%; height: 150px; object-fit: contain; }
+
+        /* TESTIMONIALS SECTION */
+
+        .testimonials-section { 
+        background: #1f394d; 
+        padding: 80px 5%; 
+        text-align: center; 
+    }
+    
+    .test-container { 
+        display: flex; 
+        justify-content: center; 
+        gap: 30px; 
+        margin-top: 80px; 
+        flex-wrap: wrap; 
+    }
+
+    .test-card { 
+        background: white; 
+        padding: 40px 30px; 
+        border-radius: 20px; 
+        width: 300px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        transition: 0.3s;
+        position: relative;
+    }
+    
+    .test-card:hover { transform: translateY(-10px); }
+
+
+    /* PROFILE PICTURE STYLING */
+    .profile-pic {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        position: absolute;
+        top: -40px; /* Moves photo halfway outside the card */
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* The Star Ratings */
+    .stars { 
+        color: #fbbf24; /* Gold color */
+        font-size: 1.2rem; 
+        margin-bottom: 15px; 
+    }
+
+    .test-card p { 
+        font-style: italic; 
+        color: #475569; 
+        line-height: 1.7; 
+        font-size: 0.95rem;
+    }
+
+    .test-card h4 { 
+        margin-top: 25px; 
+        color: var(--dark); 
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .verified-tag {
+        color: #22c55e;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: block;
+        margin-top: 5px;
+    }
+
+        /* FOOTER */
+        footer { background: var(--dark); color: white; padding: 50px 5%; text-align: center; }
+
+
+        /* CAROUSEL CONTAINER */
+    .carousel-container {
+        position: relative;
+        padding: 0 5%;
+        display: flex;
+        align-items: center;
+    }
+
+    .carousel-wrapper {
+        display: flex;
+        overflow-x: hidden; /* Hide the scrollbar */
+        scroll-behavior: smooth;
+        padding: 20px 0;
+        gap: 20px;
+    }
+
+    .carousel-item { 
+        flex: 0 0 220px; /* Force cards to stay same width */
+        background: white; 
+        padding: 15px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+        cursor: pointer;
+        transition: 0.3s;
+        text-align: center;
+    }
+    .carousel-item:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+    .carousel-item img { width: 100%; height: 150px; object-fit: contain; }
+
+    /* NAVIGATION ARROWS */
+    .arrow-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: white;
+        border: 1px solid #ddd;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: 0.3s;
+    }
+    .arrow-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+    .prev-btn { left: 10px; }
+    .next-btn { right: 10px; }
+
+
+    
+
+
+
+
+
+
+footer {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 80px 10% 40px;
+    font-family: 'Inter', sans-serif;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-around; /* Spreads sections evenly */
+    flex-wrap: wrap;
+    gap: 40px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+    text-align: left; /* Ensures text is aligned left */
+}
+
+.footer-section h3 {
+    color: white;
+    margin-bottom: 25px;
+    font-size: 1.3rem;
+    position: relative;
+}
+
+/* Small underline for headings */
+.footer-section h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 40px;
+    height: 2px;
+    background: #2563eb;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-links a:hover {
+    color: #2563eb;
+    transform: translateX(5px);
+}
+
+.social-icons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.social-icons a {
+    background: #1e293b;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.social-icons a:hover {
+    background: #2563eb;
+    transform: translateY(-3px);
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #1e293b;
+    font-size: 0.85rem;
+}
+
+
+
+/* Back to Top Button */
+#backToTop {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    /*display: none; /* Hidden by default */
+    z-index: 1000;
+    font-size: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+#backToTop:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-5px);
+}
+
+
+
+.slider-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 20px 0;
+}
+.slider-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.5s ease-in-out;
+    padding: 10px;
+}
+/*.featured-card {
+    flex: 0 0 280px; /* Forces the card to stay 280px wide and not shrink 
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    margin-right: 20px; /* Adds space between cards 
+}
+*/
+
+
+.featured-slider {
+    width: 100%;
+    overflow: hidden; /* Prevents horizontal scroll on the whole page */
+    position: relative;
+    padding: 40px 0;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden; /* Important: keeps track contained */
+    padding: 20px 0;
+}
+
+.slider-track {
+    display: flex;
+    gap: 25px;
+    transition: transform 0.5s ease-in-out;
+    padding: 10px;
+    justify-content: flex-start; /* Keeps items start-aligned for the sliding math */
+    width: max-content; /* Critical: allows the track to be as wide as its children */
+    margin: 0 auto; /* Centers the track if it's smaller than the screen */
+}
+
+
+.featured-card {
+    flex: 0 0 300px; /* Exact width for each card */
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.featured-products-wrapper {
+    width: 100%;
+    max-width: 100%; /* Ensure it's not restricted */
+    padding: 0 60px; /* This creates the "gutters" for the arrows to live in */
+    flex: 0 0 280px; /* Forces the card to stay 280px wide and not shrink*/
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+    margin-right: 30px; /* Adds space between cards */
+}
+
+
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white; /* Light background looks better on full width */
+    color: #333;
+    border: 1px solid #ddd;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 100;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.slider-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+
+.prev { left: 10px; }
+.next { right: 10px; }
+
+
+    </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+<body>
+
+    <nav class="navbar">
+        <!--<a href="home.html" class="logo">NexStore</a>-->
+        <a href="home.html" class="logo">
+        <img src="Logo.png" alt="RubieTrends"></img>
+        </a>
+        
+ 
+        <div class="nav-links" id="auth-links">
+            <a href="home.html">Home</a>
+            
+           <!-- <span id="user-display"></span> <button onclick="logout()">Logout</button>-->
+            <div class="dropdown">
+                <a href="#">Categories <i class="fas fa-caret-down"></i></a>
+                
+                <div class="dropdown-content" id="home-category-dropdown">
+                </div>
+                
+            </div>
+        
+            <a href="index.html">Shop</a>
+            <a href="admin.html" id="adminLink" style="display: none; font-weight: bold; margin-right: 20px;">Admin Panel</a>
+
+            
+            <a href="login.html" id="login-nav-btn">Login</a>
+            <span class="search-icon-btn" onclick="toggleSearch()" style="margin-left: 20px;">🔍Search</span>
+
+            <span id="userGreeting" style="color: #f3f6f2; margin-left: 50px; cursor: pointer;"></span>
+        </div>      
+        
+    </nav>
+
+
+   
+    <div class="slider">
+        <div class="slide active" style="background: url('https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=1500&q=80') center/cover;">
+            <div class="slide-content">
+                <h1>The Future of Tech</h1>
+                <p>Exclusive gadgets for the modern world.</p>
+               <br> <a href="index.html" style="color:white; background:var(--primary); padding:12px 30px; border-radius:5px; text-decoration:none;">Shop Now</a>
+            </div>
+        </div >
+        <div class="slide " style="background: url('https://c.pxhere.com/images/dd/fb/32f6e4c9eff8c290ca3466946ce7-1595236.jpg!d') center/cover;">
+           <div class="slide-content">
+           <h1 style="color:rgb(78, 177, 222)";>Rubie Trends</h1>
+                <h4>Simplifying life with smart and powerful electronics.</h4>
+                
+       
+              
+                
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <section class="featured-slider">
+        <h2 style="text-align: center; margin-bottom: 20px; font-size : 35px;">Featured Products</h2>
+        <div class="slider-container">
+            <button class="slider-btn prev" onclick="moveSlider(-1)">&#10094;</button>
+            <div id="featured-list" class="slider-track">
+                </div>
+            <button class="slider-btn next" onclick="moveSlider(1)">&#10095;</button>
+        </div>
+    </section>
+
+    <h2 class="section-title">Trending Categories</h2>
+    <div class="cat-container" >
+        <div  class="cat-box" onclick="location.href='index.html?cat=Mobile'">
+            <img src="https://imgcdn.stablediffusionweb.com/2024/10/25/0b317669-3c4d-4235-9622-1f23d6de3dfd.jpg" alt="Electronics">
+            <div class="cat-label">Mobile</div>
+        </div>
+        <div class="cat-box" onclick="location.href='index.html?cat=Laptop'">
+            <img src="https://i.pinimg.com/originals/ff/f5/11/fff5112fbff1bd9e99da00f757c31920.jpg" alt="Electronics">
+            <div class="cat-label">Laptop</div>
+        </div>
+        <div class="cat-box" onclick="location.href='index.html?cat=Watch'">
+            <img src="https://i.pinimg.com/736x/3e/3c/f1/3e3cf1d6c7c29a0e9a0713cc7b2fbe5f.jpg" alt="Electronics">
+            <div class="cat-label">Watch</div>
+        </div>
+        <div class="cat-box" onclick="location.href='index.html?cat=Audio'">
+            <img src="https://www.apple.com/newsroom/images/product/airpods/standard/Apple-AirPods-Pro-2nd-gen-hero-220907_big.jpg.large_2x.jpg" alt="Electronics">
+            <div class="cat-label">Airpods</div>
+        </div>
+    </div>
+
+   
+        <h2 class="section-title">New Arrivals</h2>
+<div class="carousel-container">
+    <button class="arrow-btn prev-btn" onclick="scrollCarousel(-1)">&#10094;</button>
+    
+    <div class="carousel-wrapper" id="new-arrivals">
+        </div>
+
+    <button class="arrow-btn next-btn" onclick="scrollCarousel(1)">&#10095;</button>
+</div>
+
+   
+    <section class="testimonials-section">
+        <h2 class="section-title" style="margin-top:0; color:white">Customer Reviews</h2>
+        <div class="test-container">
+            
+            <div class="test-card">
+                <img src="https://tse4.mm.bing.net/th/id/OIP.WDcNNSP2tSSNirH-vnkOFQHaLH?pid=Api&P=0&h=180" class="profile-pic" alt="User 1">
+                <div class="stars">★★★★★</div>
+                <p>"The checkout process was so smooth. I received my electronic gadgets within 2 days! Highly recommended for tech lovers."</p>
+                <h4>Johny depp</h4>
+                <span class="verified-tag">✓ Verified Buyer</span>
+            </div>
+    
+            <div class="test-card">
+                <img src="https://wallpapers.com/images/hd/funny-celebrity-pictures-wcmi71px6s7pj10n.jpg" class="profile-pic" alt="User 2">
+                <div class="stars">★★★☆☆</div>
+                <p>"Love the Electronics  collection! The quality of the fabric is much better than what I expected for the price. Fits perfectly."</p>
+                <h4>Gerard Butler</h4>
+                <span class="verified-tag">✓ Verified Buyer</span>
+            </div>
+    
+            <div class="test-card">
+                <img src="https://wallpapers.com/images/hd/hollywood-celebrity-matthew-broderick-vxvj4cfrni84nxci.jpg" class="profile-pic" alt="User 3">
+                <div class="stars">★★★★☆</div>
+                <p>"The customer support team helped me track my order instantly. Very professional service and great packaging."</p>
+                <h4>Matthive Broadrick.</h4>
+                <span class="verified-tag">✓ Verified Buyer</span>
+            </div>
+    
+        </div>
+    </section>
+
+    
+    <script>
+        // 1. Automatic Slider
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    setInterval(() => {
+        if(slides.length > 0) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+    }, 5000);
+
+    // 2. Fetch New Arrivals
+    async function loadArrivals() {
+        try {
+            const response = await fetch('http://localhost:3000/api/products');
+            const products = await response.json();
+            const container = document.getElementById('new-arrivals');
+            const latest = products.slice(-8).reverse(); 
+
+            container.innerHTML = latest.map(p => `
+                <div class="carousel-item" onclick="location.href='product-details.html?id=${p.id}'">
+                    <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/150'">
+                    <h4 style="white-space:normal; font-size: 0.95rem; height: 40px; overflow: hidden;">${p.name}</h4>
+                    <p style="color:var(--primary); font-weight:bold; margin-bottom: 0;">₹${p.price}</p>
+                </div>
+            `).join('');
+        } catch(e) { console.log("Server error loading arrivals"); }
+    }
+
+    function scrollCarousel(direction) {
+        const container = document.getElementById('new-arrivals');
+        container.scrollLeft += (direction * 300);
+    }
+
+    
+
+    // --- UNIFIED NAVBAR LOGIC ---
+function updateNavbarUI() {
+    const user = JSON.parse(localStorage.getItem('logged_in_user'));
+    const loginBtn = document.getElementById('login-nav-btn');
+    const adminLink = document.getElementById('adminLink');
+    const userGreeting = document.getElementById('userGreeting');
+
+    if (user && user.username) {
+        // 1. Hide the original Login button
+        if (loginBtn) loginBtn.style.display = 'none';
+
+        // 2. Set the Greeting and Logout functionality
+        userGreeting.innerHTML = `Hi, ${user.username} <span style="font-size:0.8rem; color:#ff4d4d;">(Logout)</span>`;
+        userGreeting.onclick = function() {
+            if(confirm("Are you sure you want to logout?")) {
+                localStorage.removeItem('logged_in_user');
+                location.reload();
+            }
+        };
+
+        // 3. Show Admin Panel link ONLY if the user is 'admin'
+        if (user.username.toLowerCase() === 'admin') {
+            adminLink.style.display = 'inline-block';
+        }
+
+        // 4. Add "My Orders" link
+        if (!document.getElementById('orders-link')) {
+            const ordersLink = document.createElement('a');
+            ordersLink.id = "orders-link";
+            ordersLink.href = "order-history.html";
+            ordersLink.innerText = "My Orders";
+            ordersLink.style.marginLeft = "25px";
+            // Insert it before the greeting
+            userGreeting.parentNode.insertBefore(ordersLink, userGreeting);
+        }
+    } else {
+        // If not logged in, make sure login button is visible and greeting is empty
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        userGreeting.innerText = '';
+        adminLink.style.display = 'none';
+    }
+}
+
+// Ensure this runs when the page is ready
+document.addEventListener('DOMContentLoaded', () => {
+    loadArrivals();
+    loadFeaturedProducts();
+    updateHomeCategories();
+    updateNavbarUI(); // <--- This handles everything now
+});
+
+    // 4. Search & UI Helpers
+    function toggleSearch() {
+        const overlay = document.getElementById('searchOverlay');
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+        if (overlay.style.display === 'flex') document.getElementById('headerSearchInput').focus();
+    }
+
+    function handleSearch(event) {
+        if (event.key === 'Enter') {
+            const query = document.getElementById('headerSearchInput').value;
+            window.location.href = `index.html?search=${encodeURIComponent(query)}`;
+        }
+    }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.onscroll = function() {
+        const btn = document.getElementById("backToTop");
+        btn.style.display = (window.scrollY > 400) ? "block" : "none";
+    };
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', () => {
+        loadArrivals();
+        //handleNavbar();
+    });
+
+    function updateHomeCategories() {
+    const dropdownContainer = document.getElementById('home-category-dropdown');
+    
+    // Get categories from localStorage (fallback to defaults if empty)
+    const categories = JSON.parse(localStorage.getItem('shop_categories')) || ["Electronics"];
+
+    // Build the HTML for the dropdown
+    // We point the links to index.html with the category as a URL parameter
+    let dropdownHtml = categories.map(cat => `
+        <a href="index.html?cat=${encodeURIComponent(cat)}">${cat}</a>
+    `).join('');
+
+    dropdownContainer.innerHTML = dropdownHtml;
+}
+
+// Run this as soon as the page loads
+window.addEventListener('DOMContentLoaded', updateHomeCategories);
+
+
+
+
+let currentOffset = 0;
+
+async function loadFeaturedProducts() {
+    try {
+        // Attempt to fetch both, but handle them carefully
+        const prodRes = await fetch('http://localhost:3000/api/products');
+        const products = await prodRes.json();
+        
+        let averages = [];
+        try {
+            const avgRes = await fetch('http://localhost:3000/api/products/averages');
+            if (avgRes.ok) averages = await avgRes.json();
+        } catch (avgErr) {
+            console.warn("Averages API not reachable, showing default products.");
+        }
+        
+        // Match products with ratings (Fallback to 0 if no rating found)
+        const ratedProducts = products.map(p => {
+            const stats = averages.find(a => a.product_id === p.id);
+            return { ...p, avgRating: stats ? parseFloat(stats.avgRating) : 0 };
+        });
+
+        // If we have ratings, sort by them. Otherwise, just show products.
+        const topFeatured = ratedProducts.length > 0 
+            ? ratedProducts.sort((a, b) => b.avgRating - a.avgRating).slice(0, 8)
+            : products.slice(0, 8); 
+
+        const track = document.getElementById('featured-list');
+        
+        if (topFeatured.length === 0) {
+            track.innerHTML = "<p style='text-align:center; width:100%;'>No products available.</p>";
+            return;
+        }
+
+        track.innerHTML = topFeatured.map(p => `
+            <div class="featured-card">
+                <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/300'" style="width:100%; height:200px; object-fit:contain; border-radius:8px;">
+                <h4 style="height:45px; overflow:hidden; margin: 10px 0;">${p.name}</h4>
+                <div style="color:#fbbf24; margin-bottom:10px;">
+                    ${p.avgRating > 0 
+                        ? '★'.repeat(Math.round(p.avgRating)) + '☆'.repeat(5 - Math.round(p.avgRating)) 
+                        : '☆☆☆☆☆'}
+                </div>
+                <p style="color: #28a745; font-weight: bold; font-size:1.2rem; margin-bottom:15px;">₹${parseFloat(p.price).toFixed(2)}</p>
+                <button onclick="window.location.href='product-details.html?id=${p.id}'" 
+                        style="background:#2563eb; color:white; padding:10px 20px; border:none; border-radius:5px; width:100%; cursor:pointer; font-weight:bold;">
+                    View Details
+                </button>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error("Featured Slider Error:", err);
+        document.getElementById('featured-list').innerHTML = "<p style='color:red;'>Failed to load products. Check if server is running.</p>";
+    }
+}
+
+function moveSlider(direction) {
+    const track = document.getElementById('featured-list');
+    const container = document.querySelector('.slider-container');
+    const cardWidth = 325; // Card + Gap
+    
+    // Calculate total scrollable width
+    const visibleWidth = container.offsetWidth;
+    const totalWidth = track.scrollWidth;
+    const maxScroll = -(totalWidth - visibleWidth);
+
+    currentOffset += direction * -cardWidth;
+
+    // Boundary check: Don't go past the start
+    if (currentOffset > 0) {
+        currentOffset = 0;
+    }
+
+    // Boundary check: Don't go past the end
+    if (currentOffset < maxScroll) {
+        currentOffset = maxScroll;
+    }
+
+    track.style.transform = `translateX(${currentOffset}px)`;
+}
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', loadFeaturedProducts);
+
+// Inside home.html <script>
+   /* window.onload = function() {
+    const user = JSON.parse(localStorage.getItem('logged_in_user'));
+    const adminLink = document.getElementById('adminLink');
+
+    if (user) {
+        // Display the "Hi, username" message
+        document.getElementById('user-display').innerText = `Hi, ${user.username}`;
+
+        // SECRET DOOR: Only show Admin Panel link if username is 'admin'
+        if (user.username.toLowerCase() === 'admin') {
+            adminLink.style.display = 'inline-block';
+        }
+    }
+};
+
+window.onload = function() {
+    const user = JSON.parse(localStorage.getItem('logged_in_user'));
+    
+    if (user) {
+        document.getElementById('user-display').innerText = `Hi, ${user.username} (Logout)`;
+        
+        // Show Admin Panel link ONLY if the user is 'admin'
+        if (user.username.toLowerCase() === 'admin') {
+            document.getElementById('adminLink').style.display = 'inline-block';
+        }
+    }
+};*/
+
+/*
+window.onload = function() {
+    const user = JSON.parse(localStorage.getItem('logged_in_user'));
+    const adminLink = document.getElementById('adminLink');
+    const userGreeting = document.getElementById('userGreeting');
+
+    if (user) {
+        // Set the greeting text once
+        userGreeting.innerText = `Hi, ${user.username} (Logout)`;
+        
+        // Add logout functionality to the greeting click
+        userGreeting.onclick = function() {
+            localStorage.removeItem('logged_in_user');
+            location.reload(); // Refresh to show "Sign In" again
+        };
+
+        // Show Admin Panel link ONLY if the user is 'admin'
+        if (user.username.toLowerCase() === 'admin') {
+            adminLink.style.display = 'inline-block';
+        }
+    }
+};
+*/
+
+// At the very end of your <script> tag, use ONLY this:
+document.addEventListener('DOMContentLoaded', () => {
+    loadArrivals();
+    loadFeaturedProducts();
+    updateHomeCategories();
+    updateNavbarUI(); // This is the function we built in the previous step
+});
+
+
+</script>
+
+
+<div id="searchOverlay" class="search-overlay">
+    <span class="close-search" onclick="toggleSearch()">&times;</span>
+    <div class="search-container">
+        <h2 style="color: white; margin-bottom: 20px;">What are you looking for?</h2>
+        <input type="text" id="headerSearchInput" placeholder="Search products..." onkeypress="handleSearch(event)">
+        <p style="color: #94a3b8; margin-top: 15px;">Press Enter to search in Shop</p>
+    </div>
+</div>
+
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3 style="color: var(--primary);">RubieTrends</h3>
+            <p>Your premium destination for the latest in electronics and fashion. We provide quality products with fast delivery and 24/7 support.</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul class="footer-links">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="index.html">Shop All</a></li>
+               <!-- <li><a href="index.html?cat=Electronics">Electronics</a></li>
+                <li><a href="index.html?cat=Fashion">Fashion</a></li>
+                <li><a href="index.html?cat=Accessories">Accessories</a></li>-->
+                <p><a href="order-history.html">My Order</a></p>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <ul class="footer-links">
+                <li>📍 4Brands ,Sagar, Shivamogga, Karnataka-577401</li>
+                <li>📞 +91 9988776655</li>
+                <li>✉️ support@RubieTrends.com</li>
+                <li>⏰ Mon - Sat: 9:00 AM - 7:00 PM</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 Rubie Trends E-Commerce.</p>
+    </div>
+</footer>
+
+
+<button id="backToTop" onclick="scrollToTop()">
+    <i class="fas fa-chevron-up"></i>
+</button>
+
+</body>
+</html>

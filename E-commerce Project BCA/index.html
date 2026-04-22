@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" sizes="128x128" href="logo.png">
+    <meta charset="UTF-8">
+  <title>Rubie Trends | Index</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; }
+        .navbar { 
+            display: flex; justify-content: flex-end; align-items: center; 
+            padding: 15px 30px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            gap: 15px; position: sticky; top: 0; z-index: 100;
+        }
+
+
+        .navbar a:hover { color: #007bff !important; }
+.shop-hero { border-radius: 0 0 15px 15px; } /* Rounds the bottom corners of the hero */
+
+
+.shop-hero {
+    transition: transform 0.5s ease;
+}
+.footer-links a:hover {
+    color: #2563eb;
+    transform: translateX(5px);
+}
+.shop-hero:hover {
+    background-blend-mode: multiply; /* Makes the image slightly darker on hover */
+}
+
+        .main-layout { display: flex; padding: 20px; gap: 20px; }
+        .category-sidebar { 
+            width: 200px; background: white; padding: 20px; border-radius: 10px; 
+            height: fit-content; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .category-sidebar h3 { margin-top: 0; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .category-item { 
+            display: block; padding: 10px; cursor: pointer; color: #555; 
+            text-decoration: none; transition: 0.3s; border-radius: 5px;
+        }
+        .category-item:hover { background: #e7f1ff; color: #007bff; }
+        .category-item.active { background: #007bff; color: white; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; flex-grow: 1;}
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .price { color: #28a745; font-weight: bold; font-size: 1.2rem; }
+        button { color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        
+        #cart-sidebar { 
+            position: fixed; right: -400px; top: 0; width: 300px; height: 100%; 
+            background: white; transition: 0.4s; z-index: 1000; padding: 20px; 
+            box-shadow: -2px 0 10px rgba(0,0,0,0.2); overflow-y: auto;
+        }
+        .toast {
+            position: fixed; top: 20px; right: 20px; background: #22c55e; color: white;
+            padding: 16px 25px; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 12px; z-index: 3000;
+            transform: translateX(200%); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .toast.show { transform: translateX(0); }
+        .rating-badge {
+            background: #fff9c4; color: #fbc02d; padding: 2px 8px;
+            border-radius: 12px; font-size: 0.85rem; font-weight: bold;
+            display: inline-block; margin-bottom: 10px;
+        }
+
+
+        .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+        .logo img {
+    height: 100px; /* Adjust this value to fit your navbar height */
+    width: auto;  /* Maintains aspect ratio */
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+    transform: scale(1.05); /* Slight pop effect on hover */
+}
+
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-msg">Item added to cart!</span>
+    </div>
+
+    <div class="navbar">
+        
+        
+
+        <div style="flex: 1; display: flex; align-items: center; gap: 20px;">
+           <!-- <h2 style="margin: 0; color: #007bff; cursor: pointer;" onclick="window.location.href='home.html'">NexStore</h2>-->
+            <a href="home.html" class="logo">
+        <img src="logo.png" alt="RubieTrends"></img>
+        </a>
+            <!--<a href="home.html" style="text-decoration: none; color: #555; font-weight: 500;">Home</a>
+            <a href="index.html" style="text-decoration: none; color: #007bff; font-weight: bold;">Shop</a>-->
+        </div>
+        <span id="user-display" style="font-weight: bold; color: #333; "></span>
+        <a id="history-link" href="order-history.html" style="display: none; color: #007bff; text-decoration: none;">My Orders</a>
+        <button id="auth-btn" onclick="handleAuthAction()" style="background: #007bff; width:auto;">Login</button>
+        <button onclick="toggleCart()" style="background: #28a745; width:auto;">🛒 Cart (<span id="cart-count">0</span>)</button>
+        
+    </div>
+
+    <div id="cart-sidebar">
+        <button onclick="toggleCart()" style="background: #6c757d; margin-bottom: 10px;">Close</button>
+        <h2>Your Cart</h2>
+        <div id="cart-items"></div>
+        <hr>
+        <div style="margin: 15px 0; display: flex; gap: 5px;">
+            <input type="text" id="coupon-code" placeholder="Enter 'SAVE10'" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+            <button onclick="applyDiscount()" style="background: #fbbf24; color: #000; padding: 8px; font-weight: bold;">Apply</button>
+        </div>
+        <div id="discount-info" style="color: #22c55e; font-size: 0.9rem; margin-bottom: 5px; display: none;">Discount Applied: -10%</div>
+        <h3>Total: ₹<span id="cart-total">0.00</span></h3>
+        <button onclick="clearCart()" style="width: 100%; background: #dc3545; margin-bottom: 10px;">Clear Cart</button>
+        <button onclick="checkout()" style="width: 100%; background: #007bff;">Checkout</button>
+    </div>
+
+
+    <div class="shop-hero" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=1500&q=80'); background-size: cover; background-position: center; height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; margin-bottom: 30px;">
+        <h1 id="hero-title" style="font-size: 2.5rem; margin-bottom: 10px;">Our Collection</h1>
+        <p id="hero-subtitle" style="font-size: 1.1rem; opacity: 0.9;">Quality products delivered to your doorstep</p>
+    </div>
+
+    <div class="main-layout">
+        <!--<div class="category-sidebar">
+            <h3>Categories</h3>
+            <div class="category-item active" onclick="filterByCategory('All', this)">All Products</div>
+            <div class="category-item" onclick="filterByCategory('Electronics', this)">Electronics</div>
+            <div class="category-item" onclick="filterByCategory('Fashion', this)">Fashion</div>
+            <div class="category-item" onclick="filterByCategory('Accessories', this)">Accessories</div>
+        </div>-->
+
+        <div class="category-sidebar">
+            <h3>Categories</h3>
+            <div id="dynamic-category-list">
+                </div>
+        </div>
+
+        <div style="flex-grow: 1;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <input type="text" id="search-bar" placeholder="Search for products..." style="padding: 12px; width: 350px; border-radius: 25px; border: 1px solid #ccc; outline: none;">
+            </div>
+            <div id="product-container" class="product-grid"></div>
+        </div>
+    </div>
+
+
+
+    <div id="cart-overlay" onclick="toggleCart()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
+
+
+<script>
+    let allProducts = [];
+    let allAverages = []; 
+    let cart = JSON.parse(localStorage.getItem('my_shop_cart')) || [];
+    let discountRate = parseFloat(localStorage.getItem('cart_discount')) || 0;
+
+    async function loadProducts() {
+        try {
+            const [prodRes, avgRes] = await Promise.all([
+                fetch('http://localhost:3000/api/products'),
+                fetch('http://localhost:3000/api/products/averages')
+            ]);
+            allProducts = await prodRes.json();
+            allAverages = await avgRes.json();
+            displayProducts(allProducts);
+            updateCartUI(); 
+            updateAuthUI();
+        } catch (error) {
+            console.error("Error loading products:", error);
+            document.getElementById('product-container').innerHTML = "<h3>Server connection failed. Check if server.js is running.</h3>";
+        }
+    }
+
+    function displayProducts(products) {
+        const container = document.getElementById('product-container');
+        if (!products || products.length === 0) {
+            container.innerHTML = "<h3>No products found.</h3>";
+            return;
+        }
+        container.innerHTML = products.map(p => {
+            const stats = allAverages.find(a => a.product_id === p.id);
+            const ratingHtml = stats 
+                ? `<span class="rating-badge">⭐ ${parseFloat(stats.avgRating).toFixed(1)} (${stats.totalReviews})</span>` 
+                : `<span class="rating-badge" style="color:#999; background:#eee;">No reviews</span>`;
+
+            return `
+                <div class="card">
+                    <img src="${p.image_url}" style="width:100%; height:150px; object-fit:cover; border-radius:8px; cursor:pointer;" 
+                         onclick="window.location.href='product-details.html?id=${p.id}'">
+                    <h3>${p.name}</h3>
+                    ${ratingHtml}
+                    <p class="price">₹${parseFloat(p.price).toFixed(2)}</p>
+                    <button onclick="addToCart('${p.name}', ${p.price})" style="background: #007bff; width:100%;">Add to Cart</button>
+                </div>`;
+        }).join('');
+    }
+
+    function addToCart(name, price) {
+        const existingItem = cart.find(item => item.name === name);
+        if (existingItem) { existingItem.quantity += 1; } 
+        else { cart.push({ name, price: parseFloat(price), quantity: 1 }); }
+        saveCart();
+        showToast(`${name} added to cart!`);
+    }
+
+    function saveCart() { 
+        localStorage.setItem('my_shop_cart', JSON.stringify(cart)); 
+        updateCartUI(); 
+    }
+
+    function updateCartUI() {
+        const totalItemsCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        document.getElementById('cart-count').innerText = totalItemsCount;
+
+        const list = document.getElementById('cart-items');
+        list.innerHTML = cart.map((item, index) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                <div><strong>${item.name}</strong><br><small>₹${item.price.toFixed(2)} x ${item.quantity}</small></div>
+                <div>
+                    <button onclick="changeQuantity(${index}, -1)" style="padding:2px 8px; background:#6c757d; color:white;">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="changeQuantity(${index}, 1)" style="padding:2px 8px; background:#6c757d; color:white;">+</button>
+                    <button onclick="removeFromCart(${index})" style="padding:2px 8px; background:#dc3545; color:white; border-radius:4px; font-weight:bold;">X</button>
+                </div>
+            </div>`).join('');
+
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const finalTotal = subtotal * (1 - discountRate);
+        document.getElementById('cart-total').innerText = finalTotal.toFixed(2);
+        document.getElementById('discount-info').style.display = discountRate > 0 ? 'block' : 'none';
+    }
+
+    function changeQuantity(index, amount) {
+        cart[index].quantity += amount;
+        if (cart[index].quantity <= 0) cart.splice(index, 1);
+        saveCart();
+    }
+
+    function applyDiscount() {
+        const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+        if (code === 'SAVE10') {
+            discountRate = 0.10;
+            localStorage.setItem('cart_discount', '0.10');
+            showToast("Discount Applied!");
+        } else {
+            discountRate = 0;
+            localStorage.removeItem('cart_discount');
+            showToast("Invalid Coupon");
+        }
+        updateCartUI();
+    }
+
+
+
+    /*
+    function filterByCategory(category, element) {
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+        if (category === 'All') displayProducts(allProducts);
+        else displayProducts(allProducts.filter(p => p.category === category));
+
+        document.getElementById('hero-title').innerText = category === 'All' ? 'Our Collection' : category;
+document.getElementById('hero-subtitle').innerText = `Exploring the best in ${category}`;
+    }
+
+    document.getElementById('search-bar').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        displayProducts(allProducts.filter(p => p.name.toLowerCase().includes(term)));
+    });*/
+
+
+    function filterByCategory(category, element) {
+    // 1. Handle sidebar highlighting
+    document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+    
+    // If we passed an element (clicked it), highlight it. 
+    // If not, find the matching item in the list.
+    if (element) {
+        element.classList.add('active');
+    } else {
+        const items = document.querySelectorAll('.category-item');
+        items.forEach(item => {
+            if (item.innerText.trim() === category) item.classList.add('active');
+        });
+    }
+
+    // 2. Filter products
+    if (category === 'All') {
+        displayProducts(allProducts);
+    } else {
+        displayProducts(allProducts.filter(p => p.category === category));
+    }
+
+    // 3. Update Hero Section
+    document.getElementById('hero-title').innerText = category === 'All' ? 'Our Collection' : category;
+    document.getElementById('hero-subtitle').innerText = `Exploring the best in ${category}`;
+
+}
+
+
+
+document.getElementById('search-bar').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    
+    // Filter from all products based on the search term
+    const filtered = allProducts.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.category.toLowerCase().includes(term)
+    );
+    
+    displayProducts(filtered);
+    
+    // Optional: Reset sidebar "active" status if searching broadly
+    if (term.length > 0) {
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+    }
+});
+
+
+    /*function toggleCart() {
+        const sidebar = document.getElementById('cart-sidebar');
+        sidebar.style.right = sidebar.style.right === '0px' ? '-300px' : '0px';
+    }*/
+    /*
+    function toggleCart() {
+    const sidebar = document.getElementById('cart-sidebar');
+    // If the sidebar is hidden (right is -400px), show it (set right to 0)
+    if (sidebar.style.right === '0px') {
+        sidebar.style.right = '-400px';
+        overlay.style.display = 'none';
+    } else {
+        sidebar.style.right = '0px';
+        overlay.style.display = 'block';
+    }
+}
+*/ 
+
+
+
+function toggleCart() {
+    const sidebar = document.getElementById('cart-sidebar');
+    const overlay = document.getElementById('cart-overlay');
+    if (sidebar.style.right === '0px') {
+        sidebar.style.right = '-400px';
+        overlay.style.display = 'none';
+    } else {
+        sidebar.style.right = '0px';
+        overlay.style.display = 'block';
+    }
+}
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function updateAuthUI() {
+        const user = JSON.parse(localStorage.getItem('logged_in_user'));
+        const userDisplay = document.getElementById('user-display');
+        const authBtn = document.getElementById('auth-btn');
+        const historyLink = document.getElementById('history-link');
+        if (user) {
+            userDisplay.innerText = "Welcome, " + user.username;
+            authBtn.innerText = "Logout";
+            historyLink.style.display = "inline";
+        } else {
+            userDisplay.innerText = "";
+            authBtn.innerText = "Login";
+            historyLink.style.display = "none";
+        }
+    }
+
+    function handleAuthAction() {
+        if (localStorage.getItem('logged_in_user')) {
+            localStorage.removeItem('logged_in_user');
+            location.reload();
+        } else { window.location.href = 'login.html'; }
+    }
+
+    function checkout() {
+        if (cart.length === 0) return showToast("Cart is empty!");
+        window.location.href = localStorage.getItem('logged_in_user') ? 'checkout.html' : 'login.html';
+    }
+
+    function clearCart() {
+        if (confirm("Clear cart?")) {
+            cart = [];
+            discountRate = 0;
+            localStorage.removeItem('cart_discount');
+            saveCart();
+        }
+    }
+
+
+    function removeFromCart(index) {
+    cart.splice(index, 1);
+    saveCart();
+}
+
+
+    //loadProducts();
+/*
+    // Initialize and handle URL parameters
+async function initializePage() {
+    renderShopSidebar();
+    await loadProducts(); // Wait for products to load from server first
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const catFromUrl = urlParams.get('cat');
+    const searchFromUrl = urlParams.get('search');
+
+    if (catFromUrl) {
+        console.log("Redirected from home with category:", categoryFromUrl);
+        filterByCategory(catFromUrl, null);
+
+        highlightSidebarItem(catFromUrl);
+
+        // Find the sidebar item that matches the URL category
+        const sidebarItems = document.querySelectorAll('.category-item');
+        let targetElement = null;
+        
+        sidebarItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.innerText.trim() === catFromUrl) {
+                //targetElement = item;
+                item.classList.add('active');
+            }
+        });
+
+        // Trigger the filter
+        if (targetElement) {
+            filterByCategory(catFromUrl, targetElement);
+        } else {
+            // If category name doesn't match sidebar text exactly, filter manually
+            displayProducts(allProducts.filter(p => p.category === catFromUrl));
+        }
+    } else if (searchFromUrl) {
+        // Handle search from home page
+        document.getElementById('search-bar').value = searchFromUrl;
+        displayProducts(allProducts.filter(p => p.name.toLowerCase().includes(searchFromUrl.toLowerCase())));
+    }
+}
+
+window.addEventListener('DOMContentLoaded', initializePage);
+*/ 
+
+async function initializePage() {
+    renderShopSidebar(); // Build the sidebar first
+    await loadProducts(); // Then load product data
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const catFromUrl = urlParams.get('cat');
+    const searchFromUrl = urlParams.get('search');
+
+    if (catFromUrl) {
+        console.log("Applying category filter for:", catFromUrl);
+        // Call the filter function. It will handle highlighting the sidebar for us.
+        filterByCategory(catFromUrl, null);
+    } else if (searchFromUrl) {
+        document.getElementById('search-bar').value = searchFromUrl;
+        displayProducts(allProducts.filter(p => p.name.toLowerCase().includes(searchFromUrl.toLowerCase())));
+    }
+}
+
+// Helper to make the sidebar look correct when coming from Home
+function highlightSidebarItem(categoryName) {
+    const items = document.querySelectorAll('.category-item');
+    items.forEach(item => {
+        item.classList.remove('active');
+        if (item.innerText === categoryName) {
+            item.classList.add('active');
+        }
+    });
+}
+
+// Call the new initialize function instead of just loadProducts
+//initializePage();
+
+/*
+function renderShopSidebar() {
+    const sidebarContainer = document.getElementById('dynamic-category-list');
+    
+    // 1. Get categories from localStorage (same key used in Admin)
+    // If empty, it defaults to our original three
+    const categories = JSON.parse(localStorage.getItem('shop_categories')) || ["Electronics", "Fashion", "Accessories"];
+
+    // 2. Start with the "All Products" option
+    let sidebarHtml = `<div class="category-item active" onclick="filterByCategory('All', this)">All Products</div>`;
+
+    // 3. Add each custom category from your Admin panel
+    categories.forEach(cat => {
+        sidebarHtml += `<div class="category-item" onclick="filterByCategory('${cat}', this)">${cat}</div>`;
+    });
+
+    sidebarContainer.innerHTML = sidebarHtml;
+}*/ 
+
+
+
+function renderShopSidebar() {
+    const sidebarContainer = document.getElementById('dynamic-category-list');
+    const categories = JSON.parse(localStorage.getItem('shop_categories')) || ["Electronics", "Fashion", "Accessories"];
+
+    let sidebarHtml = `<div class="category-item active" onclick="filterByCategory('All', this)">All Products</div>`;
+    categories.forEach(cat => {
+        sidebarHtml += `<div class="category-item" onclick="filterByCategory('${cat}', this)">${cat}</div>`;
+    });
+
+    sidebarContainer.innerHTML = sidebarHtml;
+}
+
+
+initializePage();
+
+
+
+
+</script>
+
+<footer style="background: #333; color: white; padding: 40px 20px; margin-top: 50px;">
+    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
+        <div>
+            <h2 style="color:rgb(48, 122, 212);">Rubie Trends</h2>
+            <p>Your one-step shop for the latest in tech gadgets.</p>
+        </div>
+         <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul class="footer-links">
+                <li><a href="home.html"  style="color:#faf9f9";><b>Home</b></a></a></li>
+                <li><a href="index.html" style="color:#faf9f9";><b>Shop All</b></a></li>
+               <!-- <li><a href="index.html?cat=Electronics">Electronics</a></li>
+                <li><a href="index.html?cat=Fashion">Fashion</a></li>
+                <li><a href="index.html?cat=Accessories">Accessories</a></li>-->
+               
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <ul class="footer-links">
+                <li>📍 4Brands ,Sagar, Shivamogga, Karnataka-577401</li>
+                <li>📞 +91 9988776655</li>
+                <li>✉️ support@RubieTrends.com</li>
+                <li>⏰ Mon - Sat: 9:00 AM - 7:00 PM</li>
+            </ul>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 30px; border-top: 1px solid #555; padding-top: 20px;">
+        <p>&copy; 2026 Rubie Trends E-Commerce.</p>
+    </div>
+</footer>
+
+
+</body>
+</html>

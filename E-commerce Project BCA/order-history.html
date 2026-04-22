@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/png" sizes="128x128" href="logo.png">
+    <title>My Order History</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+        .header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .order-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #28a745; position: relative; }
+        .item-list { font-size: 0.9rem; color: #555; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 10px; }
+        .download-btn { background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; float: right; }
+        .download-btn:hover { background: #0056b3; }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <div class="header">
+        <a href="index.html" style="text-decoration: none; color: #007bff;">← Back to Store</a>
+        <h1 style="display: inline; margin-left: 20px;">Your Order History</h1>
+    </div>
+
+    <div id="history-container">Loading orders...</div>
+
+    <script>
+        
+    async function loadHistory() {
+        const user = JSON.parse(localStorage.getItem('logged_in_user'));
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/orders/${user.id}`);
+            const orders = await response.json();
+            const container = document.getElementById('history-container');
+
+            if (orders.length === 0) {
+                container.innerHTML = "<h3>You haven't placed any orders yet.</h3>";
+                return;
+            }
+
+            container.innerHTML = orders.map(o => {
+                const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
+                const itemsHtml = items.map(i => `${i.name} (x${i.quantity})`).join(', ');
+                
+                // Safe way to pass order data to the function
+                const orderData = JSON.stringify(o).replace(/"/g, '&quot;');
+
+                return `
+                <div class="order-card">
+                    <button class="download-btn" onclick="downloadReceipt(${orderData})">
+                        📄 Download PDF
+                    </button>
+                    <p><strong>Order ID:</strong> #${o.id} | <strong>Date:</strong> ${new Date(o.order_date).toLocaleDateString()}</p>
+                    <p><strong>Total Paid:</strong> <span style="color:#28a745; font-weight:bold;">₹${parseFloat(o.total_amount).toFixed(2)}</span></p>
+                    <div class="item-list"><strong>Items:</strong> ${itemsHtml}</div>
+                    <div style="clear: both;"></div>
+                </div>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error("Error loading history:", error);
+            document.getElementById('history-container').innerHTML = "Error loading order history.";
+        }
+    }
+
+    // THE FIXED DOWNLOAD FUNCTION
+    async function downloadReceipt(order) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // 1. Header
+        doc.setFontSize(22);
+        doc.setTextColor(0, 123, 255);
+        doc.text("RubieTrends Official Receipt", 20, 20);
+        
+        // 2. Order Info
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Order ID: #${order.id}`, 20, 35);
+        doc.text(`Date: ${new Date(order.order_date).toLocaleDateString()}`, 20, 42);
+        doc.line(20, 45, 190, 45); 
+
+        // 3. Table Header
+        doc.setFont(undefined, 'bold');
+        doc.text("Item Details", 25, 55);
+        doc.text("Total", 170, 55);
+        doc.setFont(undefined, 'normal');
+        
+        let yPos = 65;
+        let subtotal = 0;
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+
+        items.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+            doc.text(`${index + 1}. ${item.name} (x${item.quantity})`, 25, yPos);
+            doc.text(`Rs. ${itemTotal.toFixed(2)}`, 190, yPos, { align: "right" });
+            yPos += 10;
+        });
+
+        doc.line(20, yPos, 190, yPos);
+        yPos += 12;
+
+        // 4. DISCOUNT LOGIC
+        const totalPaid = parseFloat(order.total_amount);
+        
+        // Check if a discount was used (allowing for tiny rounding differences)
+        if (subtotal - totalPaid > 0.01) {
+            const discountAmount = subtotal - totalPaid;
+            doc.setFontSize(12);
+            doc.setTextColor(220, 53, 69); // Red for discount
+            doc.text(`Discount Applied:`, 100, yPos);
+            doc.text(`Rs. ${discountAmount.toFixed(2)}`, 150, yPos);
+            yPos += 10;
+        }
+
+        // 5. Final Grand Total
+        doc.setFontSize(16);
+        doc.setTextColor(40, 167, 69); // Green for total
+        doc.setFont(undefined, 'bold');
+        doc.text(`Total Amount Paid:  Rs.${totalPaid.toFixed(2)}`, 200, yPos, { align: "right" });
+
+        doc.save(`RubieTrends_order_${order.id}.pdf`);
+    }
+
+    loadHistory();
+</script>
+    
+</body>
+</html>
+

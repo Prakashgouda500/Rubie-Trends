@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" sizes="128x128" href="logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubie Trends | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(48deg, rgba(234, 69, 47, 0.54) 3%, rgba(63, 0, 251, 0.53) 43%, rgba(63, 0, 251, 0.62) 72%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color:rgba(234, 69, 47, 0.54);          
+            margin-bottom: 20px;
+            text-decoration: none;
+            display: block;
+        }
+        h2 { margin-bottom: 10px; color: #333; }
+        p { color: #777; font-size: 14px; margin-bottom: 25px; }
+        
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-size: 14px; margin-bottom: 5px; color: #555; }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 5px rgba(37, 99, 235, 0.2); }
+
+        .login-btn {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .login-btn:hover { background: linear-gradient(90deg, rgba(36, 24, 199, 0.80) 0%, rgba(2.93, 1.57, 23.29, 0.80) 100%);}
+
+        .footer-link { margin-top: 20px; font-size: 14px; }
+        .footer-link a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        
+        .error-msg { color: #dc3545; font-size: 14px; margin-bottom: 15px; display: none; }
+       
+        
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <a href="home.html" class="logo">Rubie Trends</a>
+    <h3>Welcome Back</h3>
+    <p>Please enter your details to login.</p>
+    
+    <div id="errorMessage" class="error-msg">Invalid username or password</div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" color:white; class="username-box" id="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="login-btn">Login</button>
+    </form>
+
+    <div style="text-align: right; margin-bottom: 15px;">
+        <a href="forgot-password.html" style="font-size: 12px; color: #2563eb; text-decoration: none;">Forgot Password?</a>
+    </div>
+
+    <div class="footer-link">
+        Don't have an account? <a href="signup.html">Create Account</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('errorMessage');
+
+        try {
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Store user info in localStorage for the Navbar to see
+                localStorage.setItem('logged_in_user', JSON.stringify(data.user));
+                //window.location.href = 'home.html';
+                // Redirect based on role
+                    if (data.user.username.toLowerCase().trim() === 'admin') {
+                        alert("Welcome, Admin!");
+                        window.location.href = 'admin.html'; // Go to Admin Panel
+                    } else {
+                        window.location.href = 'home.html';  // Go to regular Shop
+                        }
+            } else {
+                errorDiv.style.display = 'block';
+                errorDiv.innerText = data.message || "Invalid credentials";
+            }
+        } catch (error) {
+            console.error("Login Error:", error);
+            alert("Connection to server failed.");
+        }
+    });
+</script>
+
+</body>
+</html>
