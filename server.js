@@ -9,22 +9,29 @@ app.use(cors());
 app.use(express.json()); 
 
 // 1. Setup MySQL Connection
+require("dotenv").config();
+
+const mysql = require("mysql2");
+
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root', // Change to your password
-    database: 'Rubie_1',
-    port:3306
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: true
+    }
 });
 
 db.connect((err) => {
     if (err) {
-        console.error('Error connecting to MySQL:', err);
+        console.error("TiDB connection failed:", err);
         return;
     }
-    console.log('Connected to MySQL Database!');
-});
 
+    console.log("Connected to TiDB Cloud!");
+});
 // 2. PRODUCT ROUTES
 
 // Get average rating for ALL products (Must be ABOVE :id route)
