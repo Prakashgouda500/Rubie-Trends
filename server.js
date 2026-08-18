@@ -18,11 +18,11 @@ app.use(express.json());
 // =====================================================
 
 const db = mysql.createPool({
-    host: process.env.DB_HOST,
+    host: gateway01.ap-southeast-1.prod.aws.tidbcloud.com,
     port: Number(process.env.DB_PORT || 4000),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    user: 4FfnJA373uHLV4L.root,
+    password: uT2ZOl0ouDwCp2YC,
+    database: Rubie_1,
 
     ssl: {
         rejectUnauthorized: true
