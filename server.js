@@ -11,8 +11,6 @@ app.use(express.json());
 // 1. Setup MySQL Connection
 require("dotenv").config();
 
-const mysql = require("mysql2");
-
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
