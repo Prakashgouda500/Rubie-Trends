@@ -168,8 +168,8 @@
     async function loadProducts() {
         try {
             const [prodRes, avgRes] = await Promise.all([
-                fetch('http://localhost:3000/api/products'),
-                fetch('http://localhost:3000/api/products/averages')
+                fetch("https://rubie-trends.vercel.app/api/products"),
+                fetch("https://rubie-trends.vercel.app/api/products/averages")
             ]);
             allProducts = await prodRes.json();
             allAverages = await avgRes.json();
