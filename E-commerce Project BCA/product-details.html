@@ -45,7 +45,7 @@
     async function loadDetails() {
         if (!productId) return;
         try {
-            const response = await fetch(`http://localhost:3000/api/products/${productId}`);
+            const response = await fetch("https://rubie-trends.vercel.app/api/products/${productId}`);
             const product = await response.json();
 
             document.getElementById('product-content').innerHTML = `
